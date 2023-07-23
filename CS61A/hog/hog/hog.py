@@ -28,9 +28,7 @@ def roll_dice(num_rolls, dice=six_sided):
         curr_dice = dice()
         result, num_rowling = result + curr_dice, num_rowling+1
         if curr_dice == 1:
-            sowsad_flag = True
-       
-    
+            sowsad_flag = True 
     if sowsad_flag == True:
         result = 1
     return result
@@ -172,8 +170,9 @@ def play(strategy0, strategy1, update,
         
     while score0 < goal and score1 < goal:
         if who:
-            score1 = player_roll(score1,score0,strategy1)
-        else:
+            score1 = player_roll(score1,score0,strategy1)   #the abstraction: Don't change the formal parameters location used in the function body.
+                                                            #Instead,just change the the arguments passed in the function header
+        else:                                               #abstract names are prior to concrete names
             score0 = player_roll(score0,score1,strategy0)
         who = 1-who
             
@@ -202,6 +201,9 @@ def always_roll(n):
     assert n >= 0 and n <= 10
     # BEGIN PROBLEM 6
     "*** YOUR CODE HERE ***"
+    def always_roll_fixed(player_score,opponent_score):
+        return n    
+    return always_roll_fixed
     # END PROBLEM 6
 
 
@@ -233,6 +235,25 @@ def is_always_roll(strategy, goal=GOAL):
     """
     # BEGIN PROBLEM 7
     "*** YOUR CODE HERE ***"
+    def iter_dice(curr_dice,player_score,opponent_score):
+        return curr_dice ,strategy(player_score,opponent_score)
+        
+    def iter_score(player_score,opponent_score):
+        opponent_score = opponent_score+1
+        if opponent_score == goal and player_score < goal:
+            player_score ,opponent_score= player_score+1 ,0
+        return player_score, opponent_score
+        
+    flag = True
+    pred_dice, curr_dice= strategy(0,0), strategy(0,1)
+    player_score,opponent_score = 0,0
+    while opponent_score < goal and player_score < goal:
+        if  pred_dice != curr_dice:
+            flag = False
+            return flag
+        player_score, opponent_score = iter_score(player_score, opponent_score)
+        pred_dice ,curr_dice = iter_dice(curr_dice,player_score,opponent_score)
+    return flag
     # END PROBLEM 7
 
 
@@ -249,6 +270,13 @@ def make_averaged(original_function, total_samples=1000):
     """
     # BEGIN PROBLEM 8
     "*** YOUR CODE HERE ***"
+    def averaged_dice(*args):
+        sample_num = 0
+        dice_sum = 0
+        while sample_num<total_samples:
+            dice_sum ,sample_num = dice_sum+original_function(*args) ,sample_num+1
+        return dice_sum/total_samples
+    return averaged_dice
     # END PROBLEM 8
 
 
@@ -263,6 +291,14 @@ def max_scoring_num_rolls(dice=six_sided, total_samples=1000):
     """
     # BEGIN PROBLEM 9
     "*** YOUR CODE HERE ***"
+    min_num,curr_num,max_avg = 1,1,0
+    while curr_num <= 10:
+        curr_avg = make_averaged(roll_dice,total_samples)(curr_num,dice)
+        if max_avg < curr_avg:
+            max_avg, min_num= curr_avg, curr_num
+        curr_num = curr_num+1
+    return min_num
+        
     # END PROBLEM 9
 
 
@@ -306,6 +342,9 @@ def boar_strategy(score, opponent_score, threshold=12, num_rolls=6):
     points, and returns NUM_ROLLS otherwise. Ignore score and Fuzzy Factors.
     """
     # BEGIN PROBLEM 10
+    boar_result = boar_brawl(score,opponent_score)
+    if boar_result >= threshold:
+        num_rolls = 0
     return num_rolls  # Remove this line once implemented.
     # END PROBLEM 10
 
@@ -313,17 +352,26 @@ def boar_strategy(score, opponent_score, threshold=12, num_rolls=6):
 def fuzzy_strategy(score, opponent_score, threshold=12, num_rolls=6):
     """This strategy returns 0 dice when your score would increase by at least threshold."""
     # BEGIN PROBLEM 11
+    if fuzzy_update(0,score,opponent_score)-score >= threshold:
+        num_rolls = 0
     return num_rolls  # Remove this line once implemented.
     # END PROBLEM 11
 
 
 def final_strategy(score, opponent_score):
     """Write a brief description of your final strategy.
-
+    
     *** YOUR DESCRIPTION HERE ***
     """
     # BEGIN PROBLEM 12
-    return 6  # Remove this line once implemented.
+    num_rolls = 6
+    
+    gap = GOAL-score
+    
+    fuzzy_num = fuzzy_update(0,score,opponent_score)-score
+    if  fuzzy_num >= gap or fuzzy_num >= make_averaged(roll_dice,10)(6):
+        num_rolls = 0
+    return num_rolls  # Remove this line once implemented.
     # END PROBLEM 12
 
 
