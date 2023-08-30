@@ -196,6 +196,22 @@ def autocorrect(typed_word, word_list, diff_function, limit):
     """
     # BEGIN PROBLEM 5
     "*** YOUR CODE HERE ***"
+    def find_mindiff(word_list,cmp_list):
+        """寻找最小误差单词"""
+        cmp_v ,word,idx= 99999,"",0
+        for i in cmp_list:
+            if cmp_v > i:
+                word,cmp_v = word_list[idx],i
+            idx = idx+1
+        return word
+        
+    cmp = [diff_function(typed_word,source,limit) for source in word_list]
+    if typed_word in word_list or limit < min(cmp):
+        return typed_word
+    return find_mindiff(word_list,cmp)
+    
+    
+    
     # END PROBLEM 5
 
 
@@ -222,7 +238,20 @@ def feline_fixes(typed, source, limit):
     5
     """
     # BEGIN PROBLEM 6
-    assert False, 'Remove this line'
+    def helper(typed, source, limit,count):
+    #经验：递归需要额外的参数使用helper函数时，参数要包括外部所有参数
+        if count > limit:
+            return 1
+        if not(len(typed) and len(source)):
+            return len(typed)+len(source)       
+        else:
+            if typed[0] != source[0]:
+                count = count+1
+            return (typed[0] != source[0])+helper(typed[1:],source[1:],limit,count)
+    return helper(typed, source, limit,0)
+
+        
+    
     # END PROBLEM 6
 
 
@@ -241,22 +270,28 @@ def minimum_mewtations(typed, source, limit):
     >>> minimum_mewtations("ckiteus", "kittens", big_limit) # ckiteus -> kiteus -> kitteus -> kittens
     3
     """
-    assert False, 'Remove this line'
-    if ___________:  # Base cases should go here, you may add more base cases as needed.
+    #经验：这种递归下一步有多种选择的，可以先算出采取不同选择的最终结果，然后进行比较选最大最小
+    #递归作为工具进行筛选!!!!
+    if limit < 0:  # Base cases should go here, you may add more base cases as needed.
         # BEGIN
         "*** YOUR CODE HERE ***"
+        return 1
         # END
     # Recursive cases should go below here
-    if ___________:  # Feel free to remove or add additional cases
+    if len(typed)==0 or len(source) == 0:  # Feel free to remove or add additional cases
         # BEGIN
         "*** YOUR CODE HERE ***"
+        return len(typed)+len(source)
         # END
+    elif typed[0] == source[0]:
+        return minimum_mewtations(typed[1:], source[1:], limit)
     else:
-        add = ...  # Fill in these lines
-        remove = ...
-        substitute = ...
+        add = 1+minimum_mewtations(typed, source[1:], limit-1)  # Fill in these lines
+        remove = 1+minimum_mewtations(typed[1:], source, limit-1)
+        substitute = 1+minimum_mewtations(typed[1:], source[1:], limit-1)
         # BEGIN
         "*** YOUR CODE HERE ***"
+        return min(add,remove,substitute)
         # END
 
 
