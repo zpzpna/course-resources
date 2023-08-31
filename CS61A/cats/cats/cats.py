@@ -338,6 +338,19 @@ def report_progress(typed, prompt, user_id, upload):
     """
     # BEGIN PROBLEM 8
     "*** YOUR CODE HERE ***"
+    true_num = 0
+    all_num = len(prompt)
+    for i in range(len(typed)):
+        if typed[i] != prompt[i] :
+            break
+        true_num = true_num + 1 
+
+            
+    true_ratio = true_num/all_num
+  
+    up_info = {'id':user_id,'progress':true_ratio}
+    upload(up_info)
+    return true_ratio
     # END PROBLEM 8
 
 
@@ -360,6 +373,10 @@ def time_per_word(words, times_per_player):
     """
     # BEGIN PROBLEM 9
     "*** YOUR CODE HERE ***"
+    #用list comprehension 构造双重循环
+    times = [[times_per_player[i][j+1] - times_per_player[i][j] for j in range(len(times_per_player[0])-1)] \
+            for i in range(len(times_per_player))]
+    return match(words,times)
     # END PROBLEM 9
 
 
@@ -382,6 +399,19 @@ def fastest_words(match):
     word_indices = range(len(get_all_words(match)))    # contains an *index* for each word
     # BEGIN PROBLEM 10
     "*** YOUR CODE HERE ***"
+    result = [[]for i in player_indices]
+    
+    for word_idx in word_indices:
+        min_time = 999
+        min_player = 999
+        for player_num in player_indices:
+            now_time = time(match,player_num,word_idx)
+            if now_time < min_time:
+                min_player,min_time = player_num,now_time
+        result[min_player].append(get_word(match, word_idx))
+    return result
+        
+            
     # END PROBLEM 10
 
 
